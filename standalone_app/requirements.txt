@@ -1,0 +1,23 @@
+# Additional dependencies for standalone app (private version)
+# Install these on top of the base requirements.txt
+
+# UI and server
+uvicorn>=0.30
+
+# Deep learning frameworks
+transformers>=4.56
+torch>=2.2 ; platform_system != "Darwin" or platform_machine != "arm64"
+# For Apple Silicon, user should install torch separately per PyTorch instructions.
+torchvision>=0.17
+
+# Model-specific utilities
+# Qwen vision utilities (provides process_vision_info)
+qwen-vl-utils>=0.0.8
+# Quantization support for AWQ models
+autoawq>=0.1.8
+# Video processing for multi-frame models
+decord>=0.6.0
+
+# Optional for additional adapters
+# Uncomment if using GroundingDINO or Florence-2
+# timm>=0.9

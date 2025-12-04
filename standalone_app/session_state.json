@@ -1,0 +1,23 @@
+{
+  "model": "Florence-2",
+  "model_variant": "florence-community/Florence-2-large-ft",
+  "classes_text": "",
+  "prompt_text": "phone",
+  "threshold": 0.25,
+  "resize_scale": 3,
+  "video_processing_fps": 1,
+  "florence_task": "DENSE_REGION_CAPTION",
+  "override_user_prompt": true,
+  "device": "auto",
+  "model_variant_history": {
+    "Florence-2": "florence-community/Florence-2-large-ft"
+  },
+  "prompt_selections": {
+    "Florence-2": {
+      "system": null,
+      "user": null,
+      "override": true,
+      "override_text": "phone"
+    }
+  }
+}

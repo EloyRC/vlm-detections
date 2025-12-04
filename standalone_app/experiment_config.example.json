@@ -1,0 +1,43 @@
+{
+  "experiment_name": "owlvit_demo_objects_and_captions",
+  "input": {
+    "type": "folder",
+    "folder": "assets/captures",
+    "include_subdirs": true,
+    "videos": [],
+    "video": {
+      "sample_fps": 1.0,
+      "max_frames": 50,
+      "frame_stride": 1
+    }
+  },
+  "model": {
+    "name": "OWL-ViT",
+    "model_id": "google/owlvit-base-patch32",
+    "device": "auto",
+    "threshold": 0.25
+  },
+  "class_sets": [
+    ["person", "bicycle", "car"],
+    ["cat", "dog"]
+  ],
+  "instruction_prompts": [
+    "Detect the specified objects.",
+    "Focus only on animals."
+  ],
+  "generation_param_sweeps": {
+    "temperature": {"values": [0.0, 0.5]},
+    "max_new_tokens": {"min": 64, "max": 128, "step": 64}
+  },
+  "output": {
+    "base_dir": "assets/outputs/experiments",
+    "save_visualizations": true,
+    "save_raw_text": true,
+    "results_filename": "results.json",
+    "separate_per_param_combo": false
+  },
+  "meta": {
+    "notes": "Demonstration configuration for batch + sweep + prompts.",
+    "author": "your_name"
+  }
+}

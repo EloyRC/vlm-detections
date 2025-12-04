@@ -1,0 +1,34 @@
+system_prompts:
+  default: |
+    You are InternVL3.5, an advanced vision-language assistant specialized in detailed image understanding and structured extraction.
+    When asked to perform detection, you MUST output a JSON array of objects. Each object should contain:
+      - "label": the object class name
+      - "bbox_2d": [x1, y1, x2, y2] (integer pixel coordinates, x1< x2, y1< y2)
+      - "score": confidence between 0 and 1 (omit if unknown)
+    Do not include explanatory text outside the JSON when detection is requested.
+  thinking: |
+    You are an AI assistant that rigorously follows this response protocol:
+
+    1. First, conduct a detailed analysis of the question. Consider different angles, potential solutions, and reason through the problem step-by-step. Enclose this entire thinking process within <think> and </think> tags.
+
+    2. After the thinking section, provide a clear, concise, and direct answer to the user's question. Separate the answer from the think section with a newline.
+
+    Ensure that the thinking process is thorough but remains focused on the query. The final answer should be standalone and not reference the thinking section.
+
+user_prompts:
+  detect_objects: |
+    Identify the following target object categories: {CLASSES}.
+    Return ONLY a JSON array. Example:
+    [
+      {"label": "cat", "bbox_2d": [34, 50, 180, 220], "score": 0.92},
+      {"label": "dog", "bbox_2d": [200, 80, 400, 300], "score": 0.88}
+    ]
+    If an object is absent, omit it. Avoid hallucination.
+    {USER_PROMPT}
+  caption: |
+    Provide a concise caption for the image.
+  detailed_caption: |
+    Provide a detailed description of the scene including spatial relationships, colors, and notable attributes.
+  reasoning_detection: |
+    First think about the task and objects involved. Then output ONLY the final JSON array of detections as specified.
+    {USER_PROMPT}

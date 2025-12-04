@@ -1,0 +1,46 @@
+# Adapter registry configuration - Full version with all adapters
+# Format:
+# model_name:
+#   module: "python.module.path"
+#   class: "AdapterClassName"
+#   constructor_args:  # optional, will be passed to __init__
+#     arg_name: value
+
+adapters:
+  "OpenAI Vision (API)":
+    module: "vlm_detections.adapters.openai_vision_adapter"
+    class: "OpenAIVisionAdapter"
+    constructor_args:
+      base_url: "http://100.115.56.116:8000/v1"
+  
+  "Florence-2":
+    module: "vlm_detections.adapters.florence2_adapter"
+    class: "Florence2Adapter"
+  
+  "OWL-ViT":
+    module: "vlm_detections.adapters.owlvit_adapter"
+    class: "OwlVitAdapter"
+  
+  "GroundingDINO":
+    module: "vlm_detections.adapters.groundingdino_adapter"
+    class: "GroundingDINOAdapter"
+  
+  "Qwen2.5-VL":
+    module: "vlm_detections.adapters.qwen2_5_vl_adapter"
+    class: "Qwen25VLAdapter"
+  
+  "Qwen3-VL":
+    module: "vlm_detections.adapters.qwen3_vl_adapter"
+    class: "Qwen3VLAdapter"
+  
+  "InternVL3.5":
+    module: "vlm_detections.adapters.internvl3_5_adapter"
+    class: "InternVL35Adapter"
+  
+  "Cosmos-Reason1":
+    module: "vlm_detections.adapters.cosmos_reason1_adapter"
+    class: "CosmosReason1Adapter"
+  
+  "TRex":
+    module: "vlm_detections.adapters.trex_adapter"
+    class: "TRexAdapter"

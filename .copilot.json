@@ -1,0 +1,104 @@
+{
+  "project": {
+    "name": "VLM Detections ROS 2 Package",
+    "description": "ROS 2 package for vision-language model (VLM) object detection with plugin-based adapter architecture. Public version includes OpenAI Vision adapter; full version supports multiple adapters (Qwen2.5-VL, TRex, Cosmos-Reason1, Florence-2, etc.). Includes standalone Gradio testing app.",
+    "primary_language": "Python + C++",
+    "package_type": "ROS 2 Jazzy (ament_cmake + ament_cmake_python)",
+    "domains": ["ros2", "computer-vision", "multimodal", "llm", "object-detection"],
+    "architecture": {
+      "ros_nodes": {
+        "PromptManagerNode": "C++ node that samples camera images at configurable FPS, synchronizes with people/faces detections, annotates images, and publishes VLM prompts with text + images",
+        "VLMDetectionNode": "Python node that consumes prompts, loads VLM adapter dynamically from config, runs inference, and publishes structured detection results",
+        "VLMMonitorGUI": "Python Gradio-based monitoring GUI for real-time visualization and pausing/resuming detection pipeline"
+      },
+      "adapters": "Plugin-based system: adapters defined in config/adapters_config.yaml with module/class paths. Each adapter implements BaseVisionAdapter protocol. Runtime dynamically loads adapters via importlib.",
+      "configuration": {
+        "location": "All config YAML files installed to share/vlm_detections/config/ per ROS 2 standards",
+        "files": ["model_config.yaml (model selection, threshold, device)", "adapters_config.yaml (adapter registry)", "model_variants.yaml (model variants per adapter)", "prompts_dictionary.yaml (C++ PromptManager prompts)"],
+        "access": "Use ament_index_python.packages.get_package_share_directory('vlm_detections') - NO environment variables or hardcoded paths in ROS code"
+      },
+      "standalone_app": "Separate Gradio testing application in standalone_app/ with own config, prompt management, and requirements. Uses VLM_CONFIG_DIR environment variable to override config paths.",
+      "visualization": "vlm_detections/core/visualize.py draws Detection objects (boxes/polygons)",
+      "state_management": "ROS nodes use model_config.yaml for runtime configuration. Standalone app has separate state_persistence.py for session state."
+    }
+  },
+  "build_system": {
+    "type": "ament_cmake with ament_cmake_python",
+    "python_environment": "vlm_env conda environment (/home/eloy/miniconda3/envs/vlm_env)",
+    "workspace_root": "/home/eloy/Development/haru/vlm_ws",
+    "build_commands": {
+      "vlm_detections": "/home/eloy/miniconda3/envs/vlm_env/bin/python -m colcon build --packages-select vlm_detections --symlink-install",
+      "context_manager_ros": "/home/eloy/miniconda3/envs/vlm_env/bin/python -m colcon build --symlink-install --packages-select context_manager_ros",
+      "all_packages": "/home/eloy/miniconda3/envs/vlm_env/bin/python -m colcon build --symlink-install"
+    },
+    "note": "IMPORTANT: Always use the full Python path from vlm_env when running colcon build commands. Do not use 'colcon build' directly.",
+    "install_structure": {
+      "configs": "install/vlm_detections/share/vlm_detections/config/*.yaml",
+      "launch": "install/vlm_detections/share/vlm_detections/launch/*.launch.py",
+      "python_modules": "install/vlm_detections/lib/python3.12/site-packages/vlm_detections/",
+      "executables": "install/vlm_detections/lib/vlm_detections/{vlm_prompt_manager_cpp,vlm_ros_node,vlm_ros_gui}"
+    },
+    "launch_files": {
+      "vlm_node.launch.py": "Launches PromptManagerNode + VLMDetectionNode with configurable parameters",
+      "vlm_gui.launch.py": "Launches VLMMonitorGUI for monitoring"
+    }
+  },
+  "conventions": {
+    "naming": "snake_case for modules/functions, CamelCase for classes",
+    "typing": "Protocol typing for adapters; Detection dataclass defines output contract",
+    "ros_standards": "All config files in share directory, accessed via ament_index, paths passed as ROS parameters",
+    "dependencies": "Base package requires minimal deps (numpy, opencv, pillow, pyyaml, openai, gradio). Full adapters need transformers, torch, etc."
+  },
+  "adapters": {
+    "public_version": ["OpenAI Vision (API)"],
+    "full_version": ["OpenAI Vision (API)", "Qwen2.5-VL", "TRex", "Cosmos-Reason1", "Florence-2"],
+    "protocol": "BaseVisionAdapter with infer(image, prompt) -> List[Detection]",
+    "optional_methods": "generation_config_spec() and update_generation_params() for generative models",
+    "loading": "Dynamic loading via adapters_config.yaml using importlib.import_module"
+  },
+  "generation_parameters": {
+    "core_fields": ["max_new_tokens", "temperature", "top_p", "top_k", "num_beams", "do_sample", "num_return_sequences", "repetition_penalty"],
+    "adapter_support": {
+      "OpenAI Vision (API)": ["max_new_tokens", "temperature"],
+      "Qwen2.5-VL": ["max_new_tokens", "temperature", "top_p", "do_sample", "repetition_penalty"],
+      "TRex": ["max_new_tokens", "temperature", "top_p", "do_sample", "repetition_penalty"],
+      "Cosmos-Reason1": ["max_new_tokens", "temperature", "num_return_sequences", "do_sample"],
+      "Florence-2": ["max_new_tokens", "num_beams", "do_sample", "temperature"]
+    }
+  },
+  "topics": {
+    "subscribed": [
+      "/azure_kinect/rgb/image_raw/compressed (PromptManagerNode input)",
+      "/strawberry/people (PromptManagerNode people sync)",
+      "/faces/results (PromptManagerNode faces sync)",
+      "/vlm_prompts (VLMDetectionNode input)"
+    ],
+    "published": [
+      "/vlm_prompts (PromptManagerNode output: VLMPromptWithImages)",
+      "/vlm_debug_image (PromptManagerNode debug visualization)",
+      "/vlm_detections (VLMDetectionNode output: VLMDetectionResults)"
+    ]
+  },
+  "key_files": {
+    "ros_nodes": [
+      "vlm_detections/ros_node.py (VLMDetectionNode - Python)",
+      "vlm_detections/ros_gui_node.py (VLMMonitorGUI - Python)",
+      "src/vlm_prompt_manager_node.cpp (PromptManagerNode - C++)"
+    ],
+    "core_runtime": [
+      "vlm_detections/core/runtime.py (adapter loading, registry)",
+      "vlm_detections/utils/config_loader.py (model config loading)",
+      "vlm_detections/core/visualize.py (detection visualization)"
+    ],
+    "adapters": [
+      "vlm_detections/adapters/openai_adapter.py (OpenAI Vision API)",
+      "Full version includes: qwen_adapter.py, trex_adapter.py, cosmos_adapter.py, florence_adapter.py"
+    ],
+    "standalone": [
+      "standalone_app/app.py (Gradio UI entry point)",
+      "standalone_app/batch_infer.py (batch processing)",
+      "standalone_app/prompt_manager.py (prompt templates)",
+      "standalone_app/state_persistence.py (session state)"
+    ]
+  }
+}

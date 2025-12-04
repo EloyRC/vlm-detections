@@ -1,0 +1,5 @@
+system_prompts:
+  default: ""
+user_prompts:
+  phrases_from_classes: |
+    {CLASSES}
