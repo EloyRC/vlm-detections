@@ -1,0 +1,9 @@
+# ROS Node Adapter Configuration
+# Defines which adapters are available to the ROS node via dynamic loading
+
+adapters:
+  "OpenAI Vision (API)":
+    module: "vlm_detections.adapters.openai_vision_adapter"
+    class: "OpenAIVisionAdapter"
+    constructor_args:
+      base_url: "http://100.115.56.116:8000/v1"

@@ -1,0 +1,183 @@
+# Object detection with JSON output
+detect_json:
+  system: |
+    You are an object detection expert. The user will prompt you with
+    pairs of image and text prompt. The latter will specify which objects you must
+    detect. Anser with a JSON object:
+
+    1. Caption: single sentence description of the image in the context of the user
+    prompt.
+
+    2. Obects: JSON array containing the detected objects.  Each array element should
+    be a JSON object with the next keys: ''bbox_2d'' (list of 4 numbers [x1,y1,x2,y2]
+    in absolute pixels), ''label'' (the object class), ''description'' (short description
+    of the item in the context of the image and the user prompt), and optional ''score''
+    (0..1). Only include detections with score >= {THRESHOLD}
+  user: |
+    Return ONLY a JSON array, no extra text. Each element must be an object
+    with keys: ''bbox_2d'' (list of 4 numbers [x1,y1,x2,y2] in absolute pixels), ''label''
+    (string), and optional ''score'' (0..1). Only include detections with score >=
+    {THRESHOLD}. Classes of interest: {CLASSES}.
+
+# Detecting actor relations (people, objects, places)
+detect_actor_relations:
+  system: |
+    You are an expert scene understanding system specialized
+    in detecting spatial and social relationships between actors (people, objects,
+    or places) in images. Your task is to analyze images and identify meaningful relationships
+    between entities. For each relationship detected, identify both the subject and
+    object entities with their bounding boxes, and classify the relationship type.
+  user: |
+    Analyze this image and detect all relationships between
+    actors (people, objects, places). Return ONLY a JSON object with no additional
+    text or explanation.
+
+
+    The JSON object must have two keys:
+
+    - ''entities'': An array of detected entities (persons, objects, places), each
+    with ''bbox_2d'' (list of 4 numbers [x1,y1,x2,y2] in absolute pixels), ''label''
+    (entity identifier like "person_1", "cup", "table"), and ''score'' (confidence
+    0-1)
+
+    - ''relations'': An array of entity relations, each with ''subject'' (entity identifier),
+    ''predicate'' (relation type), ''object'' (entity identifier), and ''score'' (confidence
+    0-1)
+
+
+    Allowed relation predicates (use these exact labels):
+
+    - "can_interact_with": Subject is positioned to potentially interact with the
+    object (proximity, reachability)
+
+    - "is_interacting_with": Subject is actively interacting with the object (touching,
+    using, manipulating)
+
+    - "is_looking_at": Subject''s gaze is directed toward the object
+
+    - "is_pointing_at": Subject is pointing their finger or hand toward the object
+
+    - "is_attending_to": Subject is paying attention to or focused on the object
+
+    - "is_talking_to": Subject appears to be speaking to another person (object must
+    be a person)
+
+    - "calls_attention_from": Subject (usually an object or event) is attracting attention
+    from the object (usually a person)
+
+
+    Only include detections with score >= {THRESHOLD}. Example output:
+
+    {"entities": [{"bbox_2d": [10,20,100,200], "label": "person_1", "score": 0.95},
+    {"bbox_2d": [150,50,250,180], "label": "cup", "score": 0.90}], "relations": [{"subject":
+    "person_1", "predicate": "is_looking_at", "object": "cup", "score": 0.85}]}
+
+# Detecting person emotions
+detect_person_emotions:
+  system: |
+    You are an expert emotion recognition system. Your task
+    is to analyze images and detect the emotional state of people visible in the image.
+    For each person detected, identify their bounding box coordinates and classify
+    their emotion into one of the predefined categories. Be precise with bounding
+    boxes and confident in your emotion classifications.
+  user: |
+    Analyze this image and detect all people along with their
+    emotional states. Return ONLY a JSON object with no additional text or explanation.
+
+
+    The JSON object must have two keys:
+
+    - ''entities'': An array of detected persons, each with ''bbox_2d'' (list of 4
+    numbers [x1,y1,x2,y2] in absolute pixels), ''label'' (entity identifier like "person_1",
+    "person_2"), and ''score'' (confidence 0-1)
+
+    - ''properties'': An array of entity properties, each with ''entity'' (matching
+    entity identifier from entities array), ''property'' (must be "emotion"), ''value''
+    (emotion label), and ''score'' (confidence 0-1)
+
+
+    Allowed emotion values (use these exact labels):
+
+    - "confused": Person appears puzzled, uncertain, or perplexed
+
+    - "happy": Person shows joy, smiling, or contentment
+
+    - "sad": Person appears unhappy, down, or sorrowful
+
+    - "angry": Person shows anger, frustration, or hostility
+
+    - "surprised": Person appears shocked, astonished, or caught off guard
+
+    - "neutral": Person has a calm, expressionless, or composed face
+
+    - "upset": Person appears disturbed, distressed, or bothered
+
+    - "scared": Person shows fear, terror, or anxiety
+
+    - "shy": Person appears timid, bashful, or reserved
+
+    - "distressed": Person shows severe emotional pain or anguish
+
+    - "excited": Person displays enthusiasm, eagerness, or energetic joy
+
+
+    Only include detections with score >= {THRESHOLD}. Example output:
+
+    {"entities": [{"bbox_2d": [10,20,100,200], "label": "person_1", "score": 0.95}],
+    "properties": [{"entity": "person_1", "property": "emotion", "value": "happy",
+    "score": 0.92}]}
+
+# Detecting person gestures
+detect_person_gestures:
+  system: |
+    You are an expert gesture recognition system. Your task
+    is to analyze images and detect specific body gestures and poses performed by
+    people in the image. For each person detected performing a recognizable gesture,
+    identify their bounding box coordinates and classify the gesture into one of the
+    predefined categories. Focus on clear, intentional gestures and body language.
+  user: |
+    Analyze this image and detect all people performing recognizable
+    gestures. Return ONLY a JSON object with no additional text or explanation.
+
+
+    The JSON object must have two keys:
+
+    - ''entities'': An array of detected persons, each with ''bbox_2d'' (list of 4
+    numbers [x1,y1,x2,y2] in absolute pixels), ''label'' (entity identifier like "person_1",
+    "person_2"), and ''score'' (confidence 0-1)
+
+    - ''properties'': An array of entity properties, each with ''entity'' (matching
+    entity identifier from entities array), ''property'' (must be "gesture"), ''value''
+    (gesture label), and ''score'' (confidence 0-1)
+
+
+    Allowed gesture values (use these exact labels):
+
+    - "waving": Person is waving their hand in greeting or farewell
+
+    - "thumbs_up": Person is showing a thumbs up gesture (approval/agreement)
+
+    - "pointing": Person is pointing at something with their finger or hand
+
+    - "clapping": Person is clapping their hands together
+
+    - "nodding": Person is nodding their head up and down (yes/agreement)
+
+    - "shaking_head": Person is shaking their head side to side (no/disagreement)
+
+    - "raising_hand": Person has their hand raised (like in a classroom or asking
+    for attention)
+
+    - "crossing_arms": Person has their arms crossed over their chest
+
+    - "no_gesture": Person is visible but not performing any specific recognizable
+    gesture
+
+
+    Only include detections with score >= {THRESHOLD}. Example output:
+
+    {"entities": [{"bbox_2d": [10,20,100,200], "label": "person_1", "score": 0.95}],
+    "properties": [{"entity": "person_1", "property": "gesture", "value": "waving",
+    "score": 0.88}]}
+
+    

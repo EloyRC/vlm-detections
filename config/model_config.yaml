@@ -1,0 +1,19 @@
+# ROS Node Model Configuration
+# Simple configuration for model selection and inference parameters
+# Prompts are managed by the PromptManagerNode, not by VLMDetectionNode
+
+# Model selection
+model: "OpenAI Vision (API)"
+model_variant: "Qwen/Qwen3-VL-30B-A3B-Instruct-FP8"
+
+# Detection parameters
+threshold: 0.25
+
+# Device configuration
+device: "auto"  # auto, cuda, cpu
+
+# Generation parameters (model-specific, validated by adapter)
+generation_params:
+  max_new_tokens: 400
+  temperature: 0.0
+  top_p: 1.0
