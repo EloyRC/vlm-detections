@@ -19,14 +19,36 @@ A modular ROS 2 package for vision-language model (VLM) based perception, suppor
 sudo apt install ros-jazzy-cv-bridge ros-jazzy-vision-msgs
 ```
 
-2. **Build the package:**
+2. **Set up Python environment:**
+
+The package requires Python dependencies that should be installed in a virtual environment to avoid conflicts with system packages.
+
+```bash
+# Create and activate virtual environment
+cd /path/to/vlm-detections
+python3 -m venv vlm_venv
+source vlm_venv/bin/activate
+
+# Install package dependencies
+pip install -r requirements.txt
+
+# Install colcon for building
+pip install colcon-common-extensions
+```
+
+**Note:** The base package only requires minimal dependencies. If using the standalone testing app (see `standalone_app/README.md`), additional dependencies like `transformers` and `torch` may be needed.
+
+3. **Build the package:**
 ```bash
 cd /path/to/ros2_workspace
-colcon build --packages-select vlm-detections perception-pipeline-msgs
+
+# Build using the virtual environment's Python
+/path/to/vlm-detections/vlm_venv/bin/python -m colcon build --packages-select vlm_detections perception_pipeline_msgs --symlink-install
+
 source install/setup.bash
 ```
 
-3. **Configure your model:**
+4. **Configure your model:**
 
 Edit `config/model_config.yaml`:
 ```yaml
@@ -49,16 +71,32 @@ adapters:
       base_url: "http://your-api-endpoint:8000/v1"
 ```
 
-4. **Launch the detection node:**
+5. **Launch the detection node and prompt manager nodes:**
 ```bash
-# Set API key
+# Activate your virtual environment first
+cd /path/to/vlm-detections
+source vlm_venv/bin/activate
+
+# Set API key (optional)
 export OPENAI_API_KEY=your_api_key
 
 # Launch
-ros2 launch vlm-detections vlm_node.launch.py
+ros2 launch vlm_detections vlm_node.launch.py
 ```
 
-**Note:** The detection node requires prompts from `PromptManagerNode` (C++ node, see below).
+6. **Launch the monitoring GUI (optional):**
+
+In a separate terminal:
+```bash
+# Activate your virtual environment
+cd /path/to/vlm-detections
+source vlm_venv/bin/activate
+
+# Launch GUI
+ros2 launch vlm_detections vlm_gui.launch.py
+```
+
+The GUI provides real-time visualization of detections, performance metrics, and control to pause/resume inference.
 
 ## ROS 2 Nodes
 
@@ -456,21 +494,26 @@ def update_generation_params(self, params: Dict[str, object]) -> None:
 
 ## Launch Options
 
+**Important:** Always activate your virtual environment before launching ROS nodes:
+```bash
+source vlm_venv/bin/activate
+```
+
 **Launch detection node:**
 ```bash
-ros2 launch vlm-detections vlm_node.launch.py
+ros2 launch vlm_detections vlm_node.launch.py
 ```
 
 **Launch with custom config:**
 ```bash
-ros2 launch vlm-detections vlm_node.launch.py \
+ros2 launch vlm_detections vlm_node.launch.py \
     model_config_file:=/path/to/custom_config.yaml \
     device:=cuda
 ```
 
 **Launch with monitoring GUI:**
 ```bash
-ros2 launch vlm-detections vlm_gui.launch.py
+ros2 launch vlm_detections vlm_gui.launch.py
 ```
 
 ## Message Types

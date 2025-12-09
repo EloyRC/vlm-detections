@@ -19,13 +19,13 @@ def generate_launch_description():
             name='vlm_prompt_manager_node',
             output='screen',
             parameters=[{
-                'input_image_topic': '/camera1/image_compressed',
+                'input_image_topic': '/azure_kinect/rgb/image_raw/compressed',
                 'people_topic': '/strawberry/people',
                 'output_topic': '/vlm_prompts',
                 'fps': 0.1,  # Sample rate: 0.1 Hz = 1 sample every 10 seconds
                 'batch_capacity': 1,  # 1=single image mode, >1=batch mode
                 'prompts_dictionary': prompts_dictionary_path,
-                'enable_people_annotation': False,
+                'enable_people_annotation': True,
                 'people_sync_tolerance': 0.2,  # seconds
                 'enable_faces_annotation': False,
                 'faces_topic': '/faces/results',
