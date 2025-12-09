@@ -33,7 +33,7 @@ source vlm_venv/bin/activate
 pip install -r requirements.txt
 
 # Install colcon for building
-pip install colcon-common-extensions
+pip install colcon-common-extensions lark
 ```
 
 **Note:** The base package only requires minimal dependencies. If using the standalone testing app (see `standalone_app/README.md`), additional dependencies like `transformers` and `torch` may be needed.

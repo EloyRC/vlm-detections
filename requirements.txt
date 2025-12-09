@@ -1,8 +1,8 @@
 # Core dependencies for ROS package (public version)
 # These are required for the OpenAI Vision adapter and ROS nodes
 
-numpy>=1.26
-opencv-python>=4.10.0
+numpy==1.26
+opencv-python==4.10.0.84
 pillow>=10.3
 pyyaml>=6.0
 
